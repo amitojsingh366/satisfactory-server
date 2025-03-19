@@ -76,6 +76,9 @@ RUN set -x && \
 RUN echo '#!/bin/bash\nexec box64 /home/steam/.local/share/Steam/steamcmd/steamcmd.sh "$@"' > /usr/bin/steamcmd && \
     chmod +x /usr/bin/steamcmd
 
+# Ensure PATH includes /usr/bin and /usr/local/bin.
+ENV PATH="/usr/local/bin:/usr/bin:${PATH}"
+
 # Create /tmp/dumps directory.
 RUN mkdir -p /tmp/dumps && chown steam:steam /tmp/dumps
 
