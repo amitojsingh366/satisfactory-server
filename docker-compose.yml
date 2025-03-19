@@ -2,9 +2,7 @@ services:
   satisfactory-server:
     container_name: 'satisfactory-server'
     hostname: 'satisfactory-server'
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: 'amitoj366/satisfactory-server:latest'
     ports:
       - '7777:7777/udp'
       - '7777:7777/tcp'
