@@ -16,9 +16,9 @@ RUN git clone https://github.com/ptitSeb/box86 && \
     make -j$(nproc) && \
     make install
 
-# Install steamcmd into the expected location.
-RUN mkdir -p /root/.local/share/Steam/steamcmd && \
-    cd /root/.local/share/Steam/steamcmd && \
+# Install steamcmd.
+RUN mkdir -p /root/steamcmd && \
+    cd /root/steamcmd && \
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 
 # Install box64.
@@ -61,23 +61,23 @@ ENV AUTOSAVENUM="5" \
     TIMEOUT="30" \
     VMOVERRIDE="false"
 
-# Install additional tools and set up steam user.
+# Install extra tools and set up steam user.
 RUN set -x && \
     apt-get update && \
     apt-get install -y gosu xdg-user-dirs curl jq tzdata --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     groupadd -g ${GID} steam && \
     useradd -u ${UID} -g ${GID} -ms /bin/bash steam && \
-    mkdir -p /home/steam/.local/share/Steam/ && \
-    cp -R /root/.local/share/Steam/steamcmd/ /home/steam/.local/share/Steam/steamcmd/ && \
-    chown -R ${UID}:${GID} /home/steam/.local/ && \
+    chown -R ${UID}:${GID} /root/steamcmd && \
     gosu nobody true
+
+# Create steamcmd wrapper to run via box64.
+RUN echo '#!/bin/bash\nexec box64 /root/steamcmd/steamcmd.sh "$@"' > /usr/local/bin/steamcmd && \
+    chmod +x /usr/local/bin/steamcmd
 
 RUN mkdir -p /tmp/dumps && chown steam:steam /tmp/dumps
 
-
-RUN mkdir -p /config && \
-    chown steam:steam /config
+RUN mkdir -p /config && chown steam:steam /config
 
 COPY init.sh healthcheck.sh /
 COPY --chown=steam:steam run.sh /home/steam/
