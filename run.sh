@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir -p /tmp/dumps && chown steam:steam /tmp/dumps
 
 set -e
 
