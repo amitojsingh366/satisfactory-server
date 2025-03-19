@@ -39,8 +39,6 @@ ADD scripts /root
 
 EXPOSE 7777/udp 7777/tcp
 
-FROM steamcmd/steamcmd:ubuntu-22
-
 ARG GID=1000
 ARG UID=1000
 
