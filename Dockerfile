@@ -55,7 +55,7 @@ RUN git clone https://github.com/ptitSeb/box86 && \
     make -j$(nproc) && \
     make install
 
-# Install steamcmd into /steamcmd.
+# Install SteamCMD into /steamcmd.
 RUN mkdir -p /steamcmd && \
     cd /steamcmd && \
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
