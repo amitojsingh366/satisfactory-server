@@ -73,11 +73,8 @@ RUN set -x && \
     gosu nobody true
 
 # Create steamcmd wrapper to run via box64.
-RUN echo '#!/bin/bash\nexec box64 /home/steam/.local/share/Steam/steamcmd/steamcmd.sh "$@"' > /usr/local/bin/steamcmd && \
-    chmod +x /usr/local/bin/steamcmd
-
-# Update PATH so steamcmd is found.
-ENV PATH="/usr/local/bin:${PATH}"
+RUN echo '#!/bin/bash\nexec box64 /home/steam/.local/share/Steam/steamcmd/steamcmd.sh "$@"' > /usr/bin/steamcmd && \
+    chmod +x /usr/bin/steamcmd
 
 # Create /tmp/dumps directory.
 RUN mkdir -p /tmp/dumps && chown steam:steam /tmp/dumps
