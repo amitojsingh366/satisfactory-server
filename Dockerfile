@@ -84,6 +84,9 @@ RUN set -x && \
 RUN mkdir -p /config && \
     chown steam:steam /config
 
+RUN mkdir -p /tmp/dump && \
+    chown steam:steam /tmp/dump
+
 # Copy init, healthcheck, and run scripts.
 COPY init.sh healthcheck.sh /
 COPY --chown=steam:steam run.sh /home/steam/
