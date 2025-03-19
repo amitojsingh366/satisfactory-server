@@ -40,6 +40,7 @@ RUN dpkg --add-architecture armhf && \
       gosu \
       xdg-user-dirs \
       jq \
+      procps \
       tzdata && \
     rm -rf /var/lib/apt/lists/*
 
