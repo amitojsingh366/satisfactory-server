@@ -136,7 +136,7 @@ fi
 cd /config/gamefiles || exit 1
 
 chmod +x FactoryServer.sh || true
-./FactoryServer.sh -Port="$SERVERGAMEPORT" "${ini_args[@]}" "$@" &
+box64 ./FactoryServer.sh -Port="$SERVERGAMEPORT" "${ini_args[@]}" "$@" &
 
 sleep 2
 satisfactory_pid=$(ps --ppid ${!} o pid=)
