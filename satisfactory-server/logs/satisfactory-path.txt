@@ -1,1 +1,0 @@
-Satisfactory logs can be found in /config/gamefiles/FactoryGame/Saved/Logs
