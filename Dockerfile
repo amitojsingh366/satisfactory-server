@@ -17,8 +17,7 @@ RUN git clone https://github.com/ptitSeb/box86 && \
     make install
 
 # Install steamcmd.
-RUN mkdir -p /root/steamcmd && \
-    cd /root/steamcmd && \
+RUN mkdir steamcmd && cd steamcmd && \
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 
 # Install box64.
@@ -29,7 +28,7 @@ RUN git clone https://github.com/ptitSeb/box64 && \
     make -j$(nproc) && \
     make install
 
-# Clean up build process.
+# Clean up build.
 RUN rm -rf /root/box64 /root/box86 && \
     apt-get autoremove --purge -y curl vim git cmake python3 gcc-arm-linux-gnueabihf
 
@@ -68,13 +67,19 @@ RUN set -x && \
     rm -rf /var/lib/apt/lists/* && \
     groupadd -g ${GID} steam && \
     useradd -u ${UID} -g ${GID} -ms /bin/bash steam && \
-    chown -R ${UID}:${GID} /root/steamcmd && \
+    mkdir -p /home/steam/.local/share/Steam/ && \
+    cp -R /root/steamcmd/ /home/steam/.local/share/Steam/steamcmd/ && \
+    chown -R ${UID}:${GID} /home/steam/.local/ && \
     gosu nobody true
 
 # Create steamcmd wrapper to run via box64.
-RUN echo '#!/bin/bash\nexec box64 /root/steamcmd/steamcmd.sh "$@"' > /usr/local/bin/steamcmd && \
+RUN echo '#!/bin/bash\nexec box64 /home/steam/.local/share/Steam/steamcmd/steamcmd.sh "$@"' > /usr/local/bin/steamcmd && \
     chmod +x /usr/local/bin/steamcmd
 
+# Update PATH so steamcmd is found.
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Create /tmp/dumps directory.
 RUN mkdir -p /tmp/dumps && chown steam:steam /tmp/dumps
 
 RUN mkdir -p /config && chown steam:steam /config
