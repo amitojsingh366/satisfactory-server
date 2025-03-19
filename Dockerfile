@@ -2,38 +2,36 @@ FROM debian:12.4-slim
 
 WORKDIR /app
 
-# Install deps
-RUN \
-dpkg --add-architecture armhf;\
-apt-get update && apt-get install -y curl libc6:armhf vim git cmake python3 gcc-arm-linux-gnueabihf;
+# Install dependencies.
+RUN dpkg --add-architecture armhf && \
+    apt-get update && \
+    apt-get install -y curl libc6:armhf vim git cmake python3 gcc-arm-linux-gnueabihf
 
 WORKDIR /root
-# Install box86
-RUN \
-git clone https://github.com/ptitSeb/box86;\
-cd box86;\
-mkdir build; cd build; cmake .. -DARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo;\
-make -j$(nproc);\
-make install
+# Install box86.
+RUN git clone https://github.com/ptitSeb/box86 && \
+    cd box86 && \
+    mkdir build && cd build && \
+    cmake .. -DARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
+    make -j$(nproc) && \
+    make install
 
-# Install steamcmd
-RUN \
-mkdir steamcmd && cd steamcmd;\
-curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -;
+# Install steamcmd into the expected location.
+RUN mkdir -p /root/.local/share/Steam/steamcmd && \
+    cd /root/.local/share/Steam/steamcmd && \
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 
-# Install box64
-RUN \
-git clone https://github.com/ptitSeb/box64;\
-cd box64;\
-mkdir build; cd build; cmake .. -DARM_DYNAREC=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo;\
-make -j$(nproc);\
-make install
+# Install box64.
+RUN git clone https://github.com/ptitSeb/box64 && \
+    cd box64 && \
+    mkdir build && cd build && \
+    cmake .. -DARM_DYNAREC=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
+    make -j$(nproc) && \
+    make install
 
-# Clean up build process
-RUN \
-rm -rf /root/box64 /root/box86;\
-apt-get autoremove --purge -y curl vim git cmake python3 gcc-arm-linux-gnueabihf 
-
+# Clean up build process.
+RUN rm -rf /root/box64 /root/box86 && \
+    apt-get autoremove --purge -y curl vim git cmake python3 gcc-arm-linux-gnueabihf
 
 ADD scripts /root
 
@@ -63,20 +61,23 @@ ENV AUTOSAVENUM="5" \
     TIMEOUT="30" \
     VMOVERRIDE="false"
 
-# hadolint ignore=DL3008
-RUN set -x \
- && apt-get update \
- && apt-get install -y gosu xdg-user-dirs curl jq tzdata --no-install-recommends \
- && rm -rf /var/lib/apt/lists/* \
- && groupadd -g ${GID} steam \
- && useradd -u ${UID} -g ${GID} -ms /bin/bash steam \
- && mkdir -p /home/steam/.local/share/Steam/ \
- && cp -R /root/.local/share/Steam/steamcmd/ /home/steam/.local/share/Steam/steamcmd/ \
- && chown -R ${UID}:${GID} /home/steam/.local/ \
- && gosu nobody true
+# Install additional tools and set up steam user.
+RUN set -x && \
+    apt-get update && \
+    apt-get install -y gosu xdg-user-dirs curl jq tzdata --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -g ${GID} steam && \
+    useradd -u ${UID} -g ${GID} -ms /bin/bash steam && \
+    mkdir -p /home/steam/.local/share/Steam/ && \
+    cp -R /root/.local/share/Steam/steamcmd/ /home/steam/.local/share/Steam/steamcmd/ && \
+    chown -R ${UID}:${GID} /home/steam/.local/ && \
+    gosu nobody true
 
-RUN mkdir -p /config \
- && chown steam:steam /config
+RUN mkdir -p /tmp/dumps && chown steam:steam /tmp/dumps
+
+
+RUN mkdir -p /config && \
+    chown steam:steam /config
 
 COPY init.sh healthcheck.sh /
 COPY --chown=steam:steam run.sh /home/steam/
